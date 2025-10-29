@@ -88,6 +88,7 @@ pipeline {
             deleteDir()
         }
         success {
+            echo "Mohammed Zain ul Hassan, i236030"
             echo "Pipeline succeeded! Version ${APP_VERSION} built and tested."
         }
         failure {
