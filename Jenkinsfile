@@ -44,6 +44,8 @@ pipeline {
                 echo "Simulating build process..."
                 mkdir -p build
                 cp src/*.js build/
+                # remove test files from build output to avoid duplicate test discovery
+                rm -f build/*.test.js || true
                 echo "Build completed successfully!"
                 echo "App version: ${APP_VERSION}" > build/version.txt
                 '''
@@ -62,8 +64,14 @@ pipeline {
 
         stage('Package') {
             steps {
-                echo "Creating zip archive for version ${APP_VERSION}"
-                sh 'zip -r build_${APP_VERSION}.zip build'
+                echo "Creating tar.gz archive for version ${APP_VERSION}"
+                sh 'tar -czf build_${APP_VERSION}.tar.gz build'
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: 'build_${APP_VERSION}.tar.gz, build/version.txt', fingerprint: true, onlyIfSuccessful: false
             }
         }
 
