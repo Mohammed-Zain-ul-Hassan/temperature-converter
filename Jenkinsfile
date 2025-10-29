@@ -22,13 +22,18 @@ pipeline {
             steps {
                 echo "Checking out branch: ${params.BRANCH_NAME}"
                 checkout scm
+                sh """
+                git fetch --all --prune
+                git checkout ${params.BRANCH_NAME} || git checkout -b ${params.BRANCH_NAME} origin/${params.BRANCH_NAME}
+                git pull --ff-only origin ${params.BRANCH_NAME}
+                """
             }
         }
 
         stage('Install Dependencies') {
             steps {
                 echo "Installing required packages..."
-                sh 'npm install'
+                sh '[ -f package-lock.json ] && npm ci || npm install'
             }
         }
 
@@ -38,7 +43,7 @@ pipeline {
                 sh '''
                 echo "Simulating build process..."
                 mkdir -p build
-                cp *.js build/
+                cp src/*.js build/
                 echo "Build completed successfully!"
                 echo "App version: ${APP_VERSION}" > build/version.txt
                 '''
@@ -51,7 +56,7 @@ pipeline {
             }
             steps {
                 echo "Running Jest tests..."
-                sh 'npm test'
+                sh 'CI=true npm test'
             }
         }
 
