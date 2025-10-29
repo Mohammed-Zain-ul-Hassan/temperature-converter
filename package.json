@@ -9,5 +9,8 @@
   "scripts": {
     "build": "echo Building Temperature converter project",
     "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0"
   }
 }
